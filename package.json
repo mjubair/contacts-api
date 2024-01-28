@@ -1,0 +1,24 @@
+{
+  "name": "contacts-api",
+  "version": "1.0.0",
+  "description": "Contacts Books API",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mjubair/contacts-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mjubair/contacts-api/issues"
+  },
+  "homepage": "https://github.com/mjubair/contacts-api#readme",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
