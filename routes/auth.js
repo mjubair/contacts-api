@@ -1,31 +1,28 @@
 import { Router } from 'express';
 import crypto from 'crypto';
 import User from '../models/user.model.js';
+import JWT from 'jsonwebtoken';
+
+const generateAccessToken = (data) => {
+  return JWT.sign(data, process.env.JWT_SECRET, {
+    expiresIn: '1800s',
+  });
+};
 
 const router = Router();
 
 router.post('/register', async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
-
-  const salt = crypto.randomBytes(16).toString('hex');
-  const hashedPassword = crypto
-    .createHash('sha256', salt)
-    .update(password)
-    .digest('hex');
-
-  const user = new User({
-    firstName,
-    lastName,
-    email,
-    salt,
-    password: hashedPassword,
-  });
-
-  user.save();
-  res.status(201).json({
-    status: 'ok',
-    data: { _id: user._id, firstName, lastName, email },
-  });
+  try {
+    const { firstName, lastName, email, password } = req.body;
+    const user = new User({ firstName, lastName, email, password });
+    await user.save();
+    res.status(201).json({
+      status: 'ok',
+      data: { _id: user._id, firstName, lastName, email },
+    });
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 router.post('/login', async (req, res) => {
@@ -41,9 +38,13 @@ router.post('/login', async (req, res) => {
       .digest('hex');
 
     if (user.password === hashedPassword) {
+      const accessToken = generateAccessToken({
+        id: user._id,
+        email: user.email,
+      });
       res.json({
         status: 'ok',
-        data: { message: 'User logged in successfully' },
+        data: { accessToken },
       });
     } else {
       res.status(401).json({ status: 'error', error: 'Invalid credentials' });
