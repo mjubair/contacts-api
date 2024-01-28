@@ -1,6 +1,9 @@
-import express from 'express';
 import mongoose from 'mongoose';
-import authRouter from './routes/auth.js';
+import express from 'express';
+import authenticationApp from './services/authentication/index.js';
+import contactsApp from './services/contacts/index.js';
+import middlewares from './common/middlewares/app.js';
+import { authMiddleware } from './common/middlewares/auth.js';
 
 mongoose
   .connect(
@@ -10,16 +13,18 @@ mongoose
     console.log('Connected to MongoDB');
   });
 
+// Create the main Express app
 const app = express();
 
-app.use(express.json());
+middlewares(app);
 
-app.get('/', (req, res) => {
-  res.json({ status: 'ok', data: { message: 'Hello World!' } });
-});
+app.use('/auth', authenticationApp);
 
-app.use('/auth', authRouter);
+app.use(authMiddleware);
+app.use('/contacts', contactsApp);
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+// Start the server
+const port = 3000;
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
 });
